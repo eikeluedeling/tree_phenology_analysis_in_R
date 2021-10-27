@@ -1,0 +1,31 @@
+---
+title: "Learning logbook"
+author: "Eike"
+date: "10/25/2021"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# This is where we start
+
+## Lesson 1
+
+Here's what I learned
+
+## Lesson 2
+
+```{r}
+
+library(chillR)
+ch<-chilling(make_JDay(Winters_hours_gaps),Start_JDay = 100,End_JDay = 200)
+plot(y=ch$Chill_portions,x=ch$End_year)
+
+```
+
+
