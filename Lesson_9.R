@@ -10,8 +10,8 @@ library(chillR)
 
 ### Get a list of stations close to a location of interest
 station_list <- handle_gsod(action="list_stations",
-                          location=c(7.10,50.73),
-                          time_interval=c(1990,2020))
+                            location=c(7.10,50.73),
+                            time_interval=c(1990,2020))
 
 station_list
 
@@ -20,7 +20,9 @@ station_list_dwd <- handle_dwd(action="list_stations",
                           time_interval=c(1990,2020))
 
 station_list_dwd <- handle_dwd(action="list_stations",
-                             location=c(7.10,50.73))
+                             location=c(7.10,50.73),
+                             c(19160101, Date2YEARMODA(Sys.Date()))
+                             )
 
 station_list_dwd
 
@@ -59,7 +61,8 @@ write.csv(station_list,"data/station_list.csv",row.names=FALSE)
 
 write.csv(station_list_dwd,"data/station_list_dwd.csv",row.names=FALSE)
 
-write.csv(weather_clean$weather,"data/Bonn_chillR_weather.csv",row.names=FALSE)
+write.csv(weather_clean$weather,"data/Bonn_chillR_weather.csv",
+          row.names=FALSE)
 
 write.csv(weather_dwd_clean$Aachen,"data/weather_aachen.csv",row.names=FALSE)
 
