@@ -9,24 +9,24 @@ library(chillR)
 
 
 ### Get a list of stations close to a location of interest
-station_list<-handle_gsod(action="list_stations",
+station_list <- handle_gsod(action="list_stations",
                           location=c(7.10,50.73),
                           time_interval=c(1990,2020))
 
 station_list
 
-station_list_dwd<-handle_dwd(action="list_stations",
+station_list_dwd <- handle_dwd(action="list_stations",
                           location=c(7.10,50.73),
                           time_interval=c(1990,2020))
 
-station_list_dwd<-handle_dwd(action="list_stations",
+station_list_dwd <- handle_dwd(action="list_stations",
                              location=c(7.10,50.73))
 
 station_list_dwd
 
 ### download weather data for one of these stations
 
-weather<-handle_gsod(action="download_weather",
+weather <- handle_gsod(action="download_weather",
                      location=station_list$chillR_code[4],
                      time_interval=c(1990,2020))
 
@@ -47,9 +47,9 @@ weather_dwd
 
 ### "clean" weather data
 
-weather_clean<-handle_gsod(weather)
+weather_clean <- handle_gsod(weather)
 
-weather_dwd_clean<-handle_dwd(weather_dwd)
+weather_dwd_clean <- handle_dwd(weather_dwd)
 
 ### We can now save this for future use
 

@@ -1,33 +1,47 @@
 library(chillR)
-weather<-make_all_day_table(KA_weather)
-Tmin_int<-interpolate_gaps(KA_weather[,"Tmin"])
-weather[,"Tmin"]<-Tmin_int$interp
-weather[,"Tmin_interpolated"]<-Tmin_int$missing
+weather <- make_all_day_table(KA_weather)
+Tmin_int <- interpolate_gaps(KA_weather[,"Tmin"])
+weather[,"Tmin"] <- Tmin_int$interp
+weather[,"Tmin_interpolated"] <- Tmin_int$missing
 
-Tmax_int<-interpolate_gaps(KA_weather[,"Tmax"])
-weather[,"Tmax"]<-Tmax_int$interp
-weather[,"Tmax_interpolated"]<-Tmax_int$missing
+Tmax_int <- interpolate_gaps(KA_weather[,"Tmax"])
+weather[,"Tmax"] <- Tmax_int$interp
+weather[,"Tmax_interpolated"] <- Tmax_int$missing
 
 # add an extra day to the KA_weather dataset that is not connected to the days that are already there.
 # this creates a large gap, which we can then interpolate
-KA_weather_gap<-rbind(KA_weather,c(Year=2011,Month=3,Day=3,Tmax=26,Tmin=14)) 
+
+KA_weather_gap <- rbind(KA_weather,
+                        c(Year=2011,
+                          Month=3,
+                          Day=3,
+                          Tmax=26,
+                          Tmin=14)) 
 
 # fill in the gaps between Julian date 300 (late October) and 100 (early April), only returning data between 2000 and 2011
-fixed_winter_days<-fix_weather(KA_weather_gap, start_year=2000, end_year=2011, start_date=300, end_date=100)
+fixed_winter_days <- fix_weather(KA_weather_gap,
+                                 start_year=2000,
+                                 end_year=2011,
+                                 start_date=300,
+                                 end_date=100)
 
 # fill in all gaps
-fixed_all_days<-fix_weather(KA_weather_gap)
+fixed_all_days <- fix_weather(KA_weather_gap)
 
 fixed_all_days$weather
 
 fixed_all_days$QC
 
+# make some gaps in the KA_weather dataset
+gap_weather <- KA_weather[200:305,]
+gap_weather[,"Tmin_observed"] <- gap_weather$Tmin
+gap_weather$Tmin[c(2,4:5,7:9,11:14,16:20,
+                   22:27,29:35,37:44,46:54,
+                   56:65,67:77,79:90,92:104)] <- NA
+fixed_gaps <- fix_weather(gap_weather)$weather
 
-gap_weather<-KA_weather[200:305,]
-gap_weather[,"Tmin_observed"]<-gap_weather$Tmin
-gap_weather$Tmin[c(2,4:5,7:9,11:14,16:20,22:27,29:35,37:44,46:54,56:65,67:77,79:90,92:104)]<-NA
-fixed_gaps<-fix_weather(gap_weather)$weather
 
+# Plot dataset with gaps
 library(ggplot2)
 
 ggplot(data=fixed_gaps,aes(DATE,Tmin_observed)) +
@@ -37,7 +51,8 @@ ggplot(data=fixed_gaps,aes(DATE,Tmin_observed)) +
   geom_line(data=fixed_gaps,aes(DATE,Tmin),col="red",lwd=1.3)
 
 
-fixed_gaps[,"error"]<-abs(fixed_gaps$Tmin-fixed_gaps$Tmin_observed)
+# plot errors
+fixed_gaps[,"error"] <- abs(fixed_gaps$Tmin-fixed_gaps$Tmin_observed)
 
 ggplot(data=fixed_gaps,aes(DATE,error)) +
   geom_line(lwd=1.3) +
@@ -47,80 +62,89 @@ ggplot(data=fixed_gaps,aes(DATE,error)) +
 
 ### Filling long gaps in daily records
 
-Bonn<-read.csv("data/Bonn_chillR_weather.csv")
+Bonn <- read.csv("data/Bonn_chillR_weather.csv")
 
-Bonn_QC<-fix_weather(Bonn)$QC
+Bonn_QC <- fix_weather(Bonn)$QC
 
 Bonn_QC
 
-station_list<-handle_gsod(action="list_stations",location=c(7.10,50.73),time_interval=c(1990,2020))
+# Find a set of suitable supplementary stations
+station_list <- handle_gsod(action="list_stations",
+                            location=c(7.10,50.73),
+                            time_interval=c(1990,2020))
 
 station_list
 
-positions_in_station_list<-c(2,3,6)
+positions_in_station_list <- c(2,3,6)
 
-patch_weather<-list()
+patch_weather <- list()
 for(i in 1:length(positions_in_station_list))
-{patch_weather[[i]]<-handle_gsod(handle_gsod(action="download_weather",
-                                             location=station_list$chillR_code[
-                                               positions_in_station_list[i]],
-                                             time_interval=c(1990,2020)))$weather
-names(patch_weather)[i]<-station_list$STATION.NAME[
-  positions_in_station_list[i]]
-}
+  {patch_weather[[i]] <- handle_gsod(handle_gsod(action="download_weather",
+                                                 location=station_list$chillR_code[
+                                                   positions_in_station_list[i]],
+                                                 time_interval=c(1990,2020)))$weather
+  names(patch_weather)[i] <- station_list$STATION.NAME[
+    positions_in_station_list[i]]
+  }
 
-patched<-patch_daily_temperatures(weather = Bonn,
-                                  patch_weather = patch_weather)
 
-patched$statistics
-
-patched<-patch_daily_temperatures(weather = Bonn,
-                                  patch_weather = patch_weather,
-                                  max_mean_bias = 1,
-                                  max_stdev_bias = 2)
+# use supplementary stations to 'patch' gaps in the Bonn weather
+patched <- patch_daily_temperatures(weather = Bonn,
+                                    patch_weather = patch_weather)
 
 patched$statistics
 
-post_patch_stats<-fix_weather(patched)$QC
+patched <- patch_daily_temperatures(weather = Bonn,
+                                    patch_weather = patch_weather,
+                                    max_mean_bias = 1,
+                                    max_stdev_bias = 2)
+
+patched$statistics
+
+post_patch_stats <- fix_weather(patched)$QC
 
 post_patch_stats
 
-Bonn_weather<-fix_weather(patched)
+Bonn_weather <- fix_weather(patched)
 
-write.csv(Bonn_weather$weather,"data/Bonn_wheather.csv")
+write.csv(Bonn_weather$weather,"data/Bonn_weather.csv")
 
 
 
 ### Filling gaps in hourly records
 
-stations<-handle_cimis("list_stations",location=c(-122,38.5))
-downloaded_winters<-handle_cimis("download_weather",stations$chillR_code[2],
-                                 time_interval = c(2008,2008))
-winters_daily<-handle_cimis(downloaded_winters)$weather
+stations <- handle_cimis("list_stations",location=c(-122,38.5))
+downloaded_winters <- handle_cimis("download_weather",stations$chillR_code[2],
+                                   time_interval = c(2008,2008))
+winters_daily <- handle_cimis(downloaded_winters)$weather
 
-to_interp<-Winters_hours_gaps
-to_interp[,"Temp_recorded"]<-to_interp[,"Temp"]
-to_interp[,"Temp"]<-to_interp[,"Temp_gaps"]
-interp<-interpolate_gaps_hourly(hourtemps=to_interp,latitude=38.5,
-                                daily_temps=list(Winters=winters_daily))
+to_interp <- Winters_hours_gaps
+to_interp[,"Temp_recorded"] <- to_interp[,"Temp"]
+to_interp[,"Temp"] <- to_interp[,"Temp_gaps"]
+interp <- interpolate_gaps_hourly(hourtemps=to_interp,latitude=38.5,
+                                  daily_temps=list(Winters=winters_daily))
 
 
 interp$daily_patch_report
 
 interp$weather
 
-require(stats)
-y<-rnorm(100)
-IQ<-quantile(y)[4]-quantile(2)[2]
 
-inter<-interp$weather
+# quick look at quantiles (involved in error estimation)
+require(stats)
+y <- rnorm(100)
+IQ <- quantile(y)[4]-quantile(2)[2]
+
+inter <- interp$weather
 inter[,"DATE"]<-ISOdate(inter$Year,inter$Month,inter$Day,inter$Hour)
 
+# make data.frame of daily extreme temperatures for Winters
 orchard_extremes<-make_all_day_table(inter,timestep="day",
                                      input_timestep = "hour")
 
 orchard_extremes
 
+# make data.frame of hourly temperatures (based on )
 winters_hours<-stack_hourly_temps(fix_weather(winters_daily),latitude=38)$hourtemps
 start_hour_winters<-which(winters_hours$Year==inter$Year[1]&
                             winters_hours$Month==inter$Month[1]&
