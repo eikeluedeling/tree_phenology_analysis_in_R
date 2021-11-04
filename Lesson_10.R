@@ -1,5 +1,9 @@
 library(chillR)
 weather <- make_all_day_table(KA_weather)
+
+a<-c(1,NA,NA,NA,8)
+interpolate_gaps(a)
+
 Tmin_int <- interpolate_gaps(KA_weather[,"Tmin"])
 weather[,"Tmin"] <- Tmin_int$interp
 weather[,"Tmin_interpolated"] <- Tmin_int$missing
@@ -25,6 +29,8 @@ fixed_winter_days <- fix_weather(KA_weather_gap,
                                  start_date=300,
                                  end_date=100)
 
+fixed_winter_days$QC
+
 # fill in all gaps
 fixed_all_days <- fix_weather(KA_weather_gap)
 
@@ -45,20 +51,21 @@ fixed_gaps <- fix_weather(gap_weather)$weather
 library(ggplot2)
 
 ggplot(data=fixed_gaps,aes(DATE,Tmin_observed)) +
-  geom_line(lwd=1.3) +
+  geom_line(lwd=1) +
   xlab("Date") +
   ylab("Daily minimum temperature (°C)") +
-  geom_line(data=fixed_gaps,aes(DATE,Tmin),col="red",lwd=1.3)
+  geom_line(data=fixed_gaps,aes(DATE,Tmin),col="red",lwd=1)
 
 
 # plot errors
 fixed_gaps[,"error"] <- abs(fixed_gaps$Tmin-fixed_gaps$Tmin_observed)
 
 ggplot(data=fixed_gaps,aes(DATE,error)) +
-  geom_line(lwd=1.3) +
+  geom_line(lwd=1) +
   xlab("Date") +
   ylab("Error introduced by interpolation (°C)") +
-  geom_point(data=fixed_gaps[which(!fixed_gaps$no_Tmin),],aes(DATE,error),col="red",cex=3)
+  geom_point(data=fixed_gaps[which(!fixed_gaps$no_Tmin),],
+             aes(DATE,error),col="red",cex=3)
 
 ### Filling long gaps in daily records
 
@@ -86,6 +93,9 @@ for(i in 1:length(positions_in_station_list))
   names(patch_weather)[i] <- station_list$STATION.NAME[
     positions_in_station_list[i]]
   }
+
+
+#### to be continued
 
 
 # use supplementary stations to 'patch' gaps in the Bonn weather
