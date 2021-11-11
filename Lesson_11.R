@@ -4,7 +4,7 @@ library(chillR)
 ## calibrated with temperatures from 1998-2005,
 ## to generate 100 years of synthetic data (indexed 2001-2100)
 
-Temp<-temperature_generation(KA_weather,
+Temp<-temperature_generation(weather=KA_weather,
                              years=c(1998,2005),
                              sim_years = c(2001,2100))
 
@@ -47,9 +47,7 @@ g <- g + facet_wrap(vars(Data_source))
   
 g + geom_line(aes(colour = factor(Year)))
 
-g <- g + geom_smooth(aes(colour = factor(Year)))
-
-g <- g + theme(legend.position = "none")
+g <- g + geom_smooth(aes(colour = factor(Year)), show.legend = FALSE)
 
 g <- g + scale_x_date(date_labels = "%b")
 
@@ -59,8 +57,7 @@ g
 
 g <- ggplot(data=Temperatures, aes(Date,Tmax)) +
   facet_wrap(vars(Data_source)) +
-  geom_smooth(aes(colour = factor(Year))) +
-  theme(legend.position = "none") +
+  geom_smooth(aes(colour = factor(Year)), show.legend = FALSE) +
   scale_x_date(date_labels = "%b")
 g
 
@@ -76,6 +73,7 @@ chill_observed <- chilling(
   Start_JDay = 305,
   End_JDay = 59)
 
+chill_observed
 
 chill_simulated<-chilling(
   stack_hourly_temps(
@@ -84,12 +82,13 @@ chill_simulated<-chilling(
   Start_JDay = 305,
   End_JDay = 59)
 
+chill_simulated
 
 chill_comparison<-cbind(chill_observed ,Data_source="observed")
 chill_comparison<-rbind(chill_comparison,
                         cbind(chill_simulated ,Data_source="simulated"))
 
-chill_comparison[1:5,]
+chill_comparison[1:10,]
 
 # we have to remove some incomplete years (the last of the historic and
 # simulated records, where the seasons aren't complete)
@@ -97,7 +96,7 @@ chill_comparison[1:5,]
 chill_comparison_full_seasons<-chill_comparison[
   which(chill_comparison$Perc_complete==100),]
 
-
+chill_comparison_full_seasons[1:10,]
 
 g <- ggplot(chill_comparison_full_seasons, aes(x=Chill_portions))
 
@@ -123,8 +122,11 @@ g <- ggplot(chill_simulations, aes(x=Chill_portions))
 g <- g + stat_ecdf(geom = "step",lwd=1.5,col="blue")
 
 g <- g + ylab("Cumulative probability") +
-         xlab("Chill accumulation (in Chill Portions)") 
+         xlab("Chill accumulation (in Chill Portions)") + theme_bw() +
+  geom_vline(xintercept = quantile(chill_simulations$Chill_portions, 0.1)
+)
 
+g
 ## We can now also calculate Safe Winter Chill
 
 quantile(chill_simulations$Chill_portions, 0.1)
