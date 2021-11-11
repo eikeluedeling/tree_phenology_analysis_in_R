@@ -5,7 +5,13 @@ date: "11/10/2021"
 output: html_document
 ---
 
-```{r}
+```{r, message=FALSE, include=FALSE}
+require(chillR)
+require(ggplot2)
+Temperatures <- read.csv("data/Temperatures.csv")
+```
+
+```{r temperature_generation, message=FALSE, warning=FALSE, eval=FALSE}
 require(chillR)
 require(ggplot2)
 Temp<-temperature_generation(KA_weather,
@@ -16,10 +22,11 @@ Temperatures<-cbind(KA_weather[
 generated_temps<-cbind(Temp[[1]][,c("Year","Month","Day","Tmin","Tmax")],
                        Data_source="simulated")
 Temperatures<-rbind(Temperatures,generated_temps)
+```
 
-write.csv(Temperatures, file="data/Temperatures.csv", row.names = FALSE)
 
-Temperatures <- read.csv("data/Temperatures.csv")
+
+```{r, fig.cap="Generated vs. simulated temperatures", message=FALSE}
 Temperatures[,"Date"]<-as.Date(ISOdate(2000,
                                        Temperatures$Month,
                                        Temperatures$Day))
