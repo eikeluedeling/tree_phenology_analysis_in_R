@@ -1,5 +1,3 @@
-## this lesson is about saving and loading data
-
 require(chillR)
 
 
@@ -95,7 +93,7 @@ scenario_1980
 # when we first ran our weather generator, we got the following warnings:
 
 # * scenario doesn’t contain named elements - consider using the following element names:
-#     ‘data,’ ‘reference_year,’‘scenario_type,’‘labels’
+#     ‘data,’ ‘reference_year,‘scenario_type,‘labels’
 # * setting scenario_type to ‘relative’
 # * Reference year missing - can’t check if relative temperature scenario is valid
 
@@ -126,6 +124,10 @@ relative_scenario
 
 # Now we make a 1980 scenario with this new relative scenario
 temps_1980<-temperature_generation(weather=Bonn_temps, years=c(1973,2019),
+                                   sim_years=c(2001,2100),
+                                   temperature_scenario = relative_scenario)
+
+temps_1980_fail<-temperature_generation(weather=Bonn_temps, years=c(1998,2019),
                                    sim_years=c(2001,2100),
                                    temperature_scenario = relative_scenario)
 
@@ -171,7 +173,8 @@ all_scenarios[,"scenario"]<-as.numeric(scenarios[1])
 
 for (sc in scenarios[2:4])
   all_scenarios<-rbind(all_scenarios,
-                       cbind(chill_hist_scenario_list[[sc]],scenario=as.numeric(sc)))
+                       cbind(chill_hist_scenario_list[[sc]],
+                             scenario=as.numeric(sc)))
 
 all_scenarios<-all_scenarios[which(all_scenarios$Perc_complete==100),]
 
