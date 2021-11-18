@@ -1,5 +1,31 @@
 library(chillR)
 
+# first, I realized that I had forgotton to save the Bonn_temps dataset,
+# so we'll have to generate it again (and this time I remember saving it)
+
+station_list<-handle_gsod(action="list_stations",location=c(7.1,50.8))
+# download weather data for Cologne/Bonn airport
+Bonn_weather_raw<-handle_gsod(action="download_weather",
+                              location=station_list$chillR_code[1],
+                              time_interval = c(1973,2019),
+                              station_list = station_list)
+# convert weather data to chillR format
+Bonn_weather<-handle_gsod(Bonn_weather_raw)
+# check record for missing data
+fix_weather(Bonn_weather)$QC
+# (incidentally almost all gaps are for years covered by the KA_weather dataset)
+Bonn_patched<-patch_daily_temperatures(
+  weather=Bonn_weather$weather,
+  patch_weather=list(KA_weather))
+# There are still 26 days missing here, out of 47 years -
+# let's simply interpolate these gaps now
+Bonn<-fix_weather(Bonn_patched)
+Bonn_temps<-Bonn$weather
+
+write.csv(Bonn_temps, file="data/Bonn_temps.csv", row.names = FALSE)
+
+Bonn_temps<-read_tab("data/Bonn_temps.csv")
+
 # We can get future climate data from the ClimateWizard database
 # (only for RCP4.5 and RCP8.5 of the AR5 scenarios, so this is going to be
 # outdated soon)
@@ -13,6 +39,8 @@ getClimateWizardData(coordinates=c(longitude=10.61,latitude=34.93),
 
 RCPs<-c("rcp45","rcp85")
 Times<-c(2050,2085)
+
+### not demonstrated in real time
 
 for(RCP in RCPs)
   for(Time in Times)
