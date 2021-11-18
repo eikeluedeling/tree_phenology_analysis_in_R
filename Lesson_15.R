@@ -34,6 +34,12 @@ getClimateWizardData(coordinates=c(longitude=10.61,latitude=34.93),
                      scenario="rcp45", start_year=2020, end_year=2050,
                      metric=c("CD18","R02"), GCMs=c("bcc-csm1-1","BNU-ESM"))
 
+getClimateWizardData(coordinates=c(longitude=10.61,latitude=34.93),
+                     scenario="rcp45", start_year=2020, end_year=2050,
+                     metric=c("monthly_min_max_temps"), GCMs=c("bcc-csm1-1"),
+                     temperature_generation_scenarios = TRUE)
+
+
 # chillR contains a convenient way to download data for all the GCMs for
 # a particular station
 
@@ -65,7 +71,8 @@ for(RCP in RCPs)
 
 scenario_1990<-temperature_scenario_from_records(Bonn_temps,1990)
 scenario_1996<-temperature_scenario_from_records(Bonn_temps,1996)
-adjustment_scenario<-temperature_scenario_baseline_adjustment(scenario_1996,scenario_1990)
+adjustment_scenario<-temperature_scenario_baseline_adjustment(scenario_1996,
+                                                              scenario_1990)
 
 adjustment_scenario
 
@@ -112,45 +119,52 @@ adjusted_scenarios<-temperature_scenario_baseline_adjustment(
 
 ######## We can't run this live #########
 
-all_past_scenario_temps<-temperature_generation(
-  weather=Bonn_temps,
-  years=c(1973,2019),
-  sim_years=c(2001,2101),
-  temperature_scenario = adjusted_scenarios)
 
-save_temperature_scenarios(
-  all_past_scenario_temps,
-  "data/Weather",
-  "Bonn_historic")
+all_past_scenario_temps <- temperature_generation(
+  weather = Bonn_temps,
+  years = c(1973, 2019),
+  sim_years = c(2001, 2101),
+  temperature_scenario = adjusted_scenarios
+)
 
+save_temperature_scenarios(all_past_scenario_temps,
+                           "data/Weather",
+                           "Bonn_historic")
 # Now temperature data for all scenarios are saved. Let's now make temperature
 # response functions to apply to these scenarios
 
-frost_model<-function(x) step_model(x,data.frame(
-  lower=c(-1000,0),
-  upper=c(0,1000),
-  weight=c(1,0)))
+frost_model <- function(x)
+  step_model(x,
+             data.frame(
+               lower = c(-1000, 0),
+               upper = c(0, 1000),
+               weight = c(1, 0)
+             ))
 
-models<-list(Chill_CP=Dynamic_Model,Heat_GDH=GDH,Frost_H=frost_model)
+models <- list(Chill_CP = Dynamic_Model,
+               Heat_GDH = GDH,
+               Frost_H = frost_model)
 
 # Now we first apply this to the historic scenarios and the observed temperature
 # data
 
-Temps<-load_temperature_scenarios("data/Weather","Bonn_historic")
-chill_past_scenarios<-tempResponse_daily_list(
+Temps <- load_temperature_scenarios("data/Weather", "Bonn_historic")
+chill_past_scenarios <- tempResponse_daily_list(
   Temps,
-  latitude=50.866,
+  latitude = 50.866,
   Start_JDay = 305,
   End_JDay = 59,
-  models=models,
-  misstolerance = 10)
-chill_observed<-tempResponse_daily_list(
+  models = models,
+  misstolerance = 10
+)
+chill_observed <- tempResponse_daily_list(
   Bonn_temps,
-  latitude=50.866,
+  latitude = 50.866,
   Start_JDay = 305,
   End_JDay = 59,
-  models=models,
-  misstolerance = 10)
+  models = models,
+  misstolerance = 10
+)
 
 save_temperature_scenarios(chill_past_scenarios,
                            "data/chill",
@@ -169,11 +183,12 @@ chill_observed<-load_temperature_scenarios(
   "data/chill",
   "Bonn_observed")
 
-chills <-make_climate_scenario(
+chills <- make_climate_scenario(
   chill_past_scenarios,
   caption = "Historic",
   historic_data = chill_observed,
-  time_series = TRUE)
+  time_series = TRUE
+)
 
 plot_climate_scenarios(
   climate_scenario_list=chills,
