@@ -1,13 +1,8 @@
 # Today we want to make our own future chill distribution plots
 
-# first we load a bunch of packages
+# first we load chillR
 
 library(chillR)
-#library(ggplot2)
-#library(reshape2)
-#library(kableExtra)
-#library(ggpmisc)
-
 
 # now we load the projection data that we generated in lesson 15
 
@@ -342,8 +337,5 @@ plot_scenarios_gg(past_observed=past_observed,
 
 
 
-
-
-library(patchwork)
 
 
