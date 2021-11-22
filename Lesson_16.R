@@ -175,6 +175,7 @@ future_2050
 future_2050<-future_2050 +
   theme_bw(base_size = 15) +
   theme(axis.ticks.y = element_blank(),
+        axis.ticks.x = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
         legend.position = "bottom",
@@ -204,6 +205,7 @@ for(y in c(2050,2085))
                   size = 5) +
     theme_bw(base_size = 15) +
     theme(axis.ticks.y = element_blank(),
+          axis.ticks.x = element_blank(),
           axis.text = element_blank(),
           axis.title = element_blank(),
           legend.position = "bottom",
