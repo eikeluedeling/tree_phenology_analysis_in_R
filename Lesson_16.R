@@ -107,6 +107,7 @@ rng
 
 
 # now we make the first plot
+library(ggplot2)
 
 past_plot<-ggplot() +
   geom_boxplot(data = past_simulated,
@@ -221,14 +222,14 @@ for(y in c(2050,2085))
 future_plot_list
 
 
-# we can easily combine the two plots
+# we can easily combine the two plots (with the patchwork package)
+library(patchwork)
 
 both_plots<-past_plot + future_plot_list
 
 both_plots
 
 # adding some layout with the patchwork package
-require(patchwork)
 
 plot <- both_plots +
   plot_layout(guides = "collect",
