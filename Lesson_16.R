@@ -209,35 +209,47 @@ for(RCP in RCPs)
 #   a structure we can then plot easily with ggplot.
 
 for(i in 1:length(chills))
-{ch<-chills[[i]]
-if(ch$caption[1]=="Historic")
-{GCMs<-rep("none",length(names(ch$data)))
-RCPs<-rep("none",length(names(ch$data)))
-Years<-as.numeric(ch$labels)
-Scenario<-rep("Historic",length(names(ch$data)))} else
-{GCMs<-names(ch$data)
-RCPs<-rep(ch$caption[1],length(names(ch$data)))
-Years<-rep(as.numeric(ch$caption[2]),length(names(ch$data)))
-Scenario<-rep("Future",length(names(ch$data)))}
-for(nam in names(ch$data))
-{for(met in metrics)
-{temp_res<-data.frame(Metric=met,
-                      GCM=GCMs[which(nam==names(ch$data))],
-                      RCP=RCPs[which(nam==names(ch$data))],
-                      Year=Years[which(nam==names(ch$data))],
-                      Result=quantile(ch$data[[nam]][,met],0.1),
-                      Scenario=Scenario[which(nam==names(ch$data))])
-if(i==1&nam==names(ch$data)[1]&met==metrics[1])
-  results<-temp_res else
-    results<-rbind(results,temp_res)
-  
-}}}
+{
+  ch <- chills[[i]]
+  if (ch$caption[1] == "Historic")
+  {
+    GCMs <- rep("none", length(names(ch$data)))
+    RCPs <- rep("none", length(names(ch$data)))
+    Years <- as.numeric(ch$labels)
+    Scenario <- rep("Historic", length(names(ch$data)))
+  } else
+  {
+    GCMs <- names(ch$data)
+    RCPs <- rep(ch$caption[1], length(names(ch$data)))
+    Years <- rep(as.numeric(ch$caption[2]), length(names(ch$data)))
+    Scenario <- rep("Future", length(names(ch$data)))
+  }
+  for (nam in names(ch$data))
+  {
+    for (met in metrics)
+    {
+      temp_res <- data.frame(
+        Metric = met,
+        GCM = GCMs[which(nam == names(ch$data))],
+        RCP = RCPs[which(nam == names(ch$data))],
+        Year = Years[which(nam == names(ch$data))],
+        Result = quantile(ch$data[[nam]][, met], 0.1),
+        Scenario = Scenario[which(nam == names(ch$data))]
+      )
+      if (i == 1 & nam == names(ch$data)[1] & met == metrics[1])
+        results <- temp_res
+      else
+        results <- rbind(results, temp_res)
+      
+    }
+  }
+}
 
-for(met in metrics)
-  results[which(results$Metric==met),"SWC"]<-
-  results[which(results$Metric==met),"Result"]/
-  results[which(results$Metric==met&results$Year==1980),"Result"]-1
-
+for (met in metrics)
+  results[which(results$Metric == met), "SWC"] <-
+  results[which(results$Metric == met), "Result"] /
+  results[which(results$Metric == met &
+                  results$Year == 1980), "Result"] - 1
 
 # Now we're ready for plotting
 # We'll work on the future first.
