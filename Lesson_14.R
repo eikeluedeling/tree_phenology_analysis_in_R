@@ -89,7 +89,7 @@ for(RCP in RCPs)
   for(Time in Times)
   {
     clim_scen<-load_ClimateWizard_scenarios(
-      "data/climateWizard",
+      "data/ClimateWizard",
       paste0("Bonn_futures_",Time,"_",RCP))
     clim_scen_adjusted<-
       temperature_scenario_baseline_adjustment(

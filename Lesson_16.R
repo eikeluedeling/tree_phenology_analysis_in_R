@@ -63,14 +63,13 @@ End_JDay<-59
 
 # apply daily models to past scenarios
 
-daily_models_past_scenarios<-tempResponse_list_daily(
-  Temps,
-  Start_JDay = Start_JDay,
-  End_JDay = End_JDay,
-  models=daily_models)
-daily_models_past_scenarios<-lapply(
-  daily_models_past_scenarios,
-  function(x) x[which(x$Perc_complete>90),])
+daily_models_past_scenarios <- tempResponse_list_daily(Temps,
+                                                       Start_JDay = Start_JDay,
+                                                       End_JDay = End_JDay,
+                                                       models = daily_models)
+daily_models_past_scenarios <- lapply(daily_models_past_scenarios,
+                                      function(x)
+                                        x[which(x$Perc_complete > 90), ])
 
 # apply hourly models to past scenarios
 
@@ -82,23 +81,23 @@ hourly_models_past_scenarios<-tempResponse_daily_list(
   models=hourly_models,
   misstolerance = 10)
 
-past_scenarios<-daily_models_past_scenarios
-past_scenarios<-lapply(
-  names(past_scenarios),
-  function(x)
-    cbind(past_scenarios[[x]],
-          hourly_models_past_scenarios[[x]][,names(hourly_models)]))
-names(past_scenarios)<-names(daily_models_past_scenarios)
+past_scenarios <- daily_models_past_scenarios
+past_scenarios <- lapply(names(past_scenarios),
+                         function(x)
+                           cbind(past_scenarios[[x]],
+                                 hourly_models_past_scenarios[[x]][, names(hourly_models)]))
+names(past_scenarios) <- names(daily_models_past_scenarios)
 
 # apply daily models to past observations
 
-daily_models_observed<-tempResponse_daily(
+daily_models_observed <- tempResponse_daily(
   Bonn_temps,
   Start_JDay = Start_JDay,
   End_JDay = End_JDay,
-  models=daily_models)
-daily_models_observed<-
-  daily_models_observed[which(daily_models_observed$Perc_complete>90),]
+  models = daily_models
+)
+daily_models_observed <-
+  daily_models_observed[which(daily_models_observed$Perc_complete > 90), ]
 
 # apply hourly models to past observations
 
@@ -258,9 +257,9 @@ library(ggplot2)
 
 rng = range(results$SWC)
 
-p_future<-ggplot(results[which(!results$GCM=="none"),],
-                 aes(GCM, y=factor(Metric, levels=metrics),
-                     fill = SWC)) +
+p_future <- ggplot(results[which(!results$GCM == "none"), ],
+                   aes(GCM, y = factor(Metric, levels = metrics),
+                       fill = SWC)) +
   geom_tile()
 
 p_future
@@ -280,7 +279,7 @@ p_future
 library(colorRamps)
 p_future <-
   p_future +
-  scale_fill_gradientn(colours=matlab.like(15),
+  scale_fill_gradientn(colours=rev(matlab.like(15)),
                        labels = scales::percent,
                        limits=rng)
 p_future
@@ -288,9 +287,13 @@ p_future
 
 p_future <-
   p_future  +
-  theme(axis.text.x = element_text(angle = 75, hjust = 1, vjust = 1)) +
-  labs(fill = "Change in\nSafe Winter Chill\nsince 1975") +
-  scale_y_discrete(labels=model_labels) +
+  theme(axis.text.x = element_text(
+    angle = 75,
+    hjust = 1,
+    vjust = 1
+  )) +
+  labs(fill = "Change in\nSafe Winter Chill\nsince 1980") +
+  scale_y_discrete(labels = model_labels) +
   ylab("Chill metric")
 p_future
 
@@ -309,7 +312,7 @@ p_past<-
 
 p_past<-
   p_past +
-  scale_fill_gradientn(colours=matlab.like(15),
+  scale_fill_gradientn(colours=rev(matlab.like(15)),
                        labels = scales::percent,
                        limits=rng)
 
@@ -319,7 +322,7 @@ p_past<-
 
 p_past<-
   p_past +
-  labs(fill = "Change in\nSafe Winter Chill\nsince 1975") +
+  labs(fill = "Change in\nSafe Winter Chill\nsince 1980") +
   scale_y_discrete(labels=model_labels) +
   ylab("Chill metric")
 
@@ -330,12 +333,19 @@ p_past
 
 require(patchwork)
 
-chill_comp_plot<-
+chill_comp_plot <-
   (p_past +
      p_future +
-     plot_layout(guides = "collect",nrow=2, heights=c(1,2))) &
-  theme(legend.position = "right",strip.background = element_blank(),
-        strip.text = element_text(face = "bold"))
+     plot_layout(
+       guides = "collect",
+       nrow = 2,
+       heights = c(1, 2)
+     )) &
+  theme(
+    legend.position = "right",
+    strip.background = element_blank(),
+    strip.text = element_text(face = "bold")
+  )
 
 chill_comp_plot
 
@@ -375,7 +385,7 @@ chill_change_plot<-
   geom_line(lwd=1.3) +
   facet_wrap(~RCP,nrow=2) +
   theme_bw(base_size=15) +
-  labs(col = "Change in\nSafe Winter Chill\nsince 1975") +
+  labs(col = "Change in\nSafe Winter Chill\nsince 1980") +
   scale_color_discrete(labels=model_labels) +
   scale_y_continuous(labels = scales::percent) +
   theme(strip.background = element_blank(),
