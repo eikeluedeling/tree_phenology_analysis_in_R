@@ -69,6 +69,7 @@ Tmax <- aggregate(temperature$Tmax,
                   by = list(temperature$Year),
                   FUN = mean)
 library(tidyr)
+tt<-cbind(Tmin,Tmax[, 2])
 
 Annual_means <-
   Tmin %>% cbind(Tmax[, 2]) %>% cbind((Tmin[, 2] + Tmax[, 2]) / 2)
@@ -78,8 +79,8 @@ Annual_means <- merge(Annual_means, Alex_first)
 Annual_means_melted <-
   melt(Annual_means[, c(1:4, 10)], id = c("Year", "JDay"))
 
-ggplot(Annual_means_melted, aes(x = value, y = JDay)) + geom_point() +
-  geom_smooth(method = "lm", formula = y ~ x) + facet_wrap("variable")
+ggplot(Annual_means_melted, aes(x = value, y = JDay,color=variable)) + geom_point() +
+  geom_smooth(method = "lm", formula = y ~ x)
 
 # a linear model
 
@@ -93,9 +94,9 @@ summary(lm(Annual_means$JDay ~ Annual_means$Tmean))
 
 temps_JDays <- make_JDay(temperature)
 
-corr_temp_pheno <- function(start_JDay,
+corr_temp_pheno <- function(start_JDay=305,
                             # the start JDay of the period
-                            end_JDay,
+                            end_JDay=59,
                             # the start JDay of the period
                             temps_JDay = temps_JDays,
                             # the temperature dataset
@@ -125,17 +126,17 @@ corr_temp_pheno <- function(start_JDay,
   slope_Tmax <-
     summary(lm(temps_bloom$JDay ~ temps_bloom$Tmax))$coefficients[2, 1]
   
-  c(
+  return(c(
     start_JDay = start_JDay,
     end_JDay = end_JDay,
     length = length(unique(sub_temps$JDay)),
     slope_Tmin = slope_Tmin,
     slope_Tmean = slope_Tmean,
     slope_Tmax = slope_Tmax
-  )
+  ))
 }
 
-corr_temp_pheno(305, 29, temps_JDays, Alex_first)
+corr_temp_pheno(305, 59, temps_JDays, Alex_first)
 
 # applying this to all kinds of date ranges
 
