@@ -1,13 +1,14 @@
 # PLS analysis with chilling and forcing data
 
+?PLS_chill_force
+?daily_chill
+
 library(chillR)
 
 # load temperature data
 
 temps<-read_tab("data/TMaxTMin1958-2019_patched.csv")
 temps_hourly<-stack_hourly_temps(temps,latitude=50.6)
-
-head(temps)
 
 # compute daily chill accumulation
 
@@ -21,25 +22,40 @@ head(daychill$daily_chill)
 
 # plot daily chill data
 
-dc<-make_daily_chill_plot2(daychill,metrics=c("Chill_Portions"),cumulative=FALSE,
-                           startdate=300,enddate=30,focusyears=c(2008), metriclabels="Chill Portions")
+dc <-
+  make_daily_chill_plot2(
+    daychill,
+    metrics = c("Chilling_Hours"),
+    cumulative = FALSE,
+    startdate = 300,
+    enddate = 30,
+    focusyears = c(2008,2015),
+    metriclabels = "Chilling Hours"
+  )
 
 # plot cumulatively
 
-dc<-make_daily_chill_plot2(daychill,metrics=c("Chill_Portions"),cumulative=TRUE,
-                           startdate=300,enddate=30,focusyears=c(2008), metriclabels="Chill Portions")
+dc <-
+  make_daily_chill_plot2(
+    daychill,
+    metrics = c("Chill_Portions"),
+    cumulative = TRUE,
+    startdate = 300,
+    enddate = 30,
+    focusyears = c(1959),
+    metriclabels = "Chill Portions"
+  )
 
 # load phenology data and run PLS analysis with chilling and forcing data
 
-Alex<-read_tab("data/Alexander_Lucas_bloom_1958_2019.csv")
-Alex_first<-Alex[,1:2]
-Alex_first[,"Year"]<-substr(Alex_first$First_bloom,1,4)
-Alex_first[,"Month"]<-substr(Alex_first$First_bloom,5,6)
-Alex_first[,"Day"]<-substr(Alex_first$First_bloom,7,8)
-Alex_first<-make_JDay(Alex_first)
-Alex_first<-Alex_first[,c("Pheno_year","JDay")]
-colnames(Alex_first)<-c("Year","pheno")
-
+Alex <- read_tab("data/Alexander_Lucas_bloom_1958_2019.csv")
+Alex_first <- Alex[, 1:2]
+Alex_first[, "Year"] <- substr(Alex_first$First_bloom, 1, 4)
+Alex_first[, "Month"] <- substr(Alex_first$First_bloom, 5, 6)
+Alex_first[, "Day"] <- substr(Alex_first$First_bloom, 7, 8)
+Alex_first <- make_JDay(Alex_first)
+Alex_first <- Alex_first[, c("Pheno_year", "JDay")]
+colnames(Alex_first) <- c("Year", "pheno")
 
 plscf<-PLS_chill_force(daily_chill_obj=daychill,
                        bio_data_frame=Alex_first,
@@ -66,7 +82,7 @@ plot_PLS(plscf, PLS_results_path= "PLS_outputs")
 
 plot_PLS(plscf,
          PLS_results_path= "PLS_outputs",
-         add_chill = c(-48,62),
+         add_chill = c(-48,-1),
          add_heat = c(-5,105.5))
 
 # ggplotting the results
@@ -83,7 +99,7 @@ PLS_gg[,"VIP_importance"]<-PLS_gg$VIP>=0.8
 PLS_gg[,"VIP_Coeff"]<-factor(sign(PLS_gg$Coef)*PLS_gg$VIP_importance)
 
 chill_start_JDay<--48
-chill_end_JDay<-62
+chill_end_JDay<-0
 heat_start_JDay<--5
 heat_end_JDay<-105.5
 
@@ -95,6 +111,7 @@ heat_end_date<-ISOdate(2001,12,31)+heat_end_JDay*24*3600
 # now we can plot
 
 library(ggplot2)
+
 
 temp_plot<- ggplot(PLS_gg,x=Date) +
   annotate("rect",
