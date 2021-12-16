@@ -7,9 +7,13 @@ tmax<-8
 latitude<-50
 
 
-weather<-make_all_day_table(data.frame(Year=c(2001,2002),
-                                       Month=c(mon,mon),
-                                       Day=c(1,ndays),Tmin=c(0,0),Tmax=c(0,0)))
+weather <- make_all_day_table(data.frame(
+  Year = c(2001, 2001),
+  Month = c(mon, mon),
+  Day = c(1, ndays),
+  Tmin = c(0, 0),
+  Tmax = c(0, 0)
+))
 
 weather$Tmin<-tmin
 weather$Tmax<-tmax
@@ -39,10 +43,15 @@ temp_model<-Dynamic_Model
 for(mon in month_range)
 {days_month<-as.numeric(difftime( ISOdate(2002,mon+1,1),
                                   ISOdate(2002,mon,1) ))
-if(mon==12) days_month<-31
-weather<-make_all_day_table(data.frame(Year=c(2001,2002),
-                                       Month=c(mon,mon),
-                                       Day=c(1,days_month),Tmin=c(0,0),Tmax=c(0,0)))
+if(mon==12)
+  days_month<-31
+weather<-make_all_day_table(data.frame(
+  Year = c(2002, 2002),
+  Month = c(mon, mon),
+  Day = c(1, days_month),
+  Tmin = c(0, 0),
+  Tmax = c(0, 0)
+))
 for(tmin in Tmins)
   for(tmax in Tmaxs)
     if(tmax>=tmin)
@@ -51,13 +60,14 @@ for(tmin in Tmins)
       weather$Tmax<-tmax
       hourtemps<-stack_hourly_temps(weather,
                                     latitude=latitude)$hourtemps$Temp
-      CP<-c(CP,do.call(Dynamic_Model,
-                       list(hourtemps))[length(hourtemps)]/(length(hourtemps)/24))
+      CP<-c(CP,do.call(temp_model,
+                       list(hourtemps))[length(hourtemps)]/nrow(weather))
       mins<-c(mins,tmin)
       maxs<-c(maxs,tmax)
       month<-c(month,mon)
     }
 }
+
 results<-data.frame(Month=month,Tmin=mins,Tmax=maxs,CP)
 results<-results[!is.na(results$Month),]
 
@@ -82,17 +92,20 @@ DM_sensitivity<-ggplot(results,aes(x=Tmin,y=Tmax,fill=CP)) +
   scale_fill_gradientn(colours=alpha(matlab.like(15), alpha = .5),
                        name="Chill/day (CP)") +
   ylim(min(results$Tmax),max(results$Tmax)) +
-  ylim(min(results$Tmin),max(results$Tmin))
+  xlim(min(results$Tmin),max(results$Tmin))
 
 DM_sensitivity
-write.csv(results,"data/model_sensitivity_development.csv",row.names = FALSE)
+
+write.csv(results,
+          "data/model_sensitivity_development.csv",
+          row.names = FALSE)
 
 
 
 DM_sensitivity <- DM_sensitivity +
   facet_wrap(vars(Month_names)) +
   ylim(min(results$Tmax),max(results$Tmax)) +
-  ylim(min(results$Tmin),max(results$Tmin))
+  xlim(min(results$Tmin),max(results$Tmin))
 
 DM_sensitivity
 
@@ -111,7 +124,7 @@ temperatures$Month_names = factor(temperatures$Month,
 
 DM_sensitivity +
   geom_point(data=temperatures,aes(x=Tmin,y=Tmax,fill=NULL,
-                                   color="Temperature"),size=0.2) +
+                                   color="Temperature"),size=0.1) +
   facet_wrap(vars(Month_names)) +
   scale_color_manual(values = "black",
                      labels = "Daily temperature \nextremes (°C)",
