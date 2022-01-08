@@ -70,9 +70,6 @@ heat <- tempResponse(
 
 
 
-
-
-
 ggplot(data = chill, aes(x = Chill_Portions)) +
   geom_histogram() +
   ggtitle("Chill accumulation during endodormancy (Chill Portions)") +
@@ -91,15 +88,15 @@ ggplot(data = heat, aes(x = GDH)) +
   theme_bw(base_size = 12)
 
 
+# Calculate mean chill and heat accumulation
 
+mean(chill$Chill_Portions)
+sd(chill$Chill_Portions)
+quantile(chill$Chill_Portions,c(0.05,0.5,0.95))
 
-
-chill_requirement <- mean(chill$Chill_Portions)
-chill_req_error <- sd(chill$Chill_Portions)
-
-heat_requirement <- mean(heat$GDH)
-heat_req_error <- sd(heat$GDH)
-
+mean(heat$GDH)
+sd(heat$GDH)
+quantile(heat$GDH,c(0.05,0.5,0.95))
 
 
 
@@ -127,8 +124,8 @@ mpt <- make_pheno_trend_plot(
 )
 
 
-
-
+start_JDay<-305
+end_JDay<-10
 
 mean_temp_period <-  function(temps, start_JDay, end_JDay, end_season = end_JDay)
   {
