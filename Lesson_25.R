@@ -466,6 +466,8 @@ day_month_from_JDay<-function(year,JDay)
   return(list(day(fulldate),month(fulldate)))
 }
 
+day_month_from_JDay(2000,307)
+
 weather_data$Day<-day_month_from_JDay(weather_data$Year,weather_data$JDay)[[1]]
 weather_data$Month<-day_month_from_JDay(weather_data$Year,weather_data$JDay)[[2]]
 
