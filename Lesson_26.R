@@ -146,8 +146,6 @@ all_months_enhanced$month_name<-factor(all_months_enhanced$Month,
                                        levels=c(6:12,1:5),
                                        labels=month.name[c(6:12,1:5)])
 
-library(tidyverse)
-
 # Calculate the hulls for each group
 hull_temps_enhanced <- all_months_enhanced %>%
   group_by(RCP_Time,month_name) %>%
@@ -172,8 +170,8 @@ ggplot(hull_temps_enhanced[which(hull_temps_enhanced$Month %in% c(10,11,12,1,2,3
 
 
 # combining past and experimentally enhanced data
-past_months$RCP_Time<-"Past_combined"
-enhanced_months$RCP_Time<-"Past_combined"
+# past_months$RCP_Time<-"Past_combined"
+# enhanced_months$RCP_Time<-"Past_combined"
 
 all_months_both<-rbind(enhanced_months,past_months,future_months)
 
@@ -190,12 +188,14 @@ ggplot(hull_temps_both[which(hull_temps_both$Month %in% c(10,11,12,1,2,3)),],
   geom_polygon() +
   facet_wrap(vars(month_name)) +
   scale_fill_manual(name="Scenario",
-                    breaks=c("Past_combined",
+                    breaks=c("Past",
+                             "Past_enhanced",
                              "RCP4.5_2050",
                              "RCP4.5_2085",
                              "RCP8.5_2050",
                              "RCP8.5_2085"),
                     values=c("black",
+                             alpha("gray",0.8),
                              alpha("light green",0.3),
                              alpha("dark green",0.3),
                              alpha("coral",0.3),
