@@ -68,14 +68,23 @@ seasons<-1959:2019
 iSeason <- genSeason(hourtemps,
                      mrange = c(8, 6),
                      years=seasons)
+
 for (sea in 1:length(seasons))
-{season_data<-hourtemps$hourtemps[iSeason[[sea]],]
-res <- PhenoFlex(temp=season_data$Temp,
-                 times=c(1: length(season_data$Temp)),
-                 zc=zc, stopatzc=TRUE, yc=yc, basic_output=FALSE)
-if(sea==1)
-  results<-season_data$DATE[res$bloomindex] else
-    results<-c(results,season_data$DATE[res$bloomindex])}
+{
+  season_data <- hourtemps$hourtemps[iSeason[[sea]], ]
+  res <- PhenoFlex(
+    temp = season_data$Temp,
+    times = c(1:length(season_data$Temp)),
+    zc = zc,
+    stopatzc = TRUE,
+    yc = yc,
+    basic_output = FALSE
+  )
+  if (sea == 1)
+    results <- season_data$DATE[res$bloomindex]
+  else
+    results <- c(results, season_data$DATE[res$bloomindex])
+}
 
 predictions<-data.frame(Season=seasons,Prediction=results)
 predictions$Prediction<-ISOdate(2001,
@@ -115,7 +124,7 @@ lower <- c(38, 180, 0.1, 0 , 3000.0,  9000.0, 6000.0,       5.e13,  0,  0,  0,  
 
 SeasonList <- genSeasonList(hourtemps$hourtemps, mrange = c(8, 6), years=c(1959:2019))
 
-# Fit_res <- phenologyFitter(par.guess=par, 
+Fit_res <- phenologyFitter(par.guess=par, 
                            modelfn = PhenoFlex_GDHwrapper,
                            bloomJDays=Alex_first$pheno[which(Alex_first$Year>1958)],
                            SeasonList=SeasonList,
