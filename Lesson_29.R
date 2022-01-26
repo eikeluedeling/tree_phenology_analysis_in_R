@@ -297,5 +297,7 @@ ggplot(temp_response, aes(Temp)) +
   theme(legend.position = c(0.85, 0.85))
 
 
+rnorm(10)
 
-
+set.seed(999)
+rnorm(10)
