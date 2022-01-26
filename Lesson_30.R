@@ -1,6 +1,8 @@
 library(leaflet)
 library(dplyr)
 library(reshape2)
+library(chillR)
+library(ggplot2)
 
 leaflet() %>%
   setView(lng=6.99, lat=50.625, zoom=12) %>%
@@ -266,3 +268,4 @@ ggplot(data=DuringBloom,aes(Year,Frost_hours)) +
 
 Kendall(x=DuringBloom$Year,y=DuringBloom$Frost_hours)
 lm(DuringBloom$Frost_hours~DuringBloom$Year)
+
