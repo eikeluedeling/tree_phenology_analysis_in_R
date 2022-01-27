@@ -42,6 +42,7 @@ ggplot(data=Alexander_Lucas,aes(Pheno_year,JDay,col=variable)) +
   geom_smooth(method = "lm")
 
 ggplot(data=Alexander_Lucas,aes(Pheno_year,JDay,col=variable)) +
+  geom_line() +
   geom_smooth() +
   theme_bw(base_size=15) +
   scale_color_discrete(
@@ -164,8 +165,7 @@ ggplot(data=Alexander_Lucas,
   scale_size(range = c(0, 3),
              breaks = c(1, 5, 10, 15, 20),
              labels = c("1", "5", "10", "15", "20"),
-             name="Frost hours") +
-  theme_bw(base_size=15)
+             name="Frost hours") 
 
 ggplot(data=Alexander_Lucas,
        aes(Pheno_year,JDay,col=variable)) +
@@ -185,7 +185,7 @@ ggplot(data=Alexander_Lucas,
              labels = c("1", "5", "10", "15", "20"),
              name="Frost hours") +
   theme_bw(base_size=15) +
-  ylim(c(80,140))
+  ylim(c(75,140))
 
 
 Ribbon_Lucas<-dcast(
@@ -207,7 +207,7 @@ ggplot(data=Ribbon_Lucas,aes(Pheno_year)) +
              labels = c("1", "5", "10", "15", "20"),
              name="Frost hours") +
   theme_bw(base_size=15) +
-  ylim(c(80,140))
+  ylim(c(75,140))
 
 # identify frost events that overlap with bloom
 lookup_dates<-Ribbon_Lucas
@@ -250,7 +250,7 @@ ggplot(data=Ribbon_Lucas,aes(Pheno_year)) +
     values=c("light green","red","light blue"),
     name="Frost timing") +
   theme_bw(base_size=15) +
-  ylim(c(77,140))
+  ylim(c(75,140))
 
 
 Bloom_frost_trend<-aggregate(
