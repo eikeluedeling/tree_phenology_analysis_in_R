@@ -367,7 +367,7 @@ future_bloom_plot
 
 # Use cowplot to merge all plot together. Not an easy and intuitive solution but works quite well if you have
 # highly customized ideas. Be careful that the final plot (the one obtained after saving) meets your requirements 
-# (alignement, font size and so on).
+# (alignment, font size and so on).
 # The plot window in RStudio is distorting the final resolution of the plot
 
 # PLEASE VISUALIZE VERSION SAVED TO FOLDER SINCE THE SIZE OF YOUR WINDOW MAY NOT FIT THE DIMENSIONS USED IN THE CALL
